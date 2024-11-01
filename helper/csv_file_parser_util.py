@@ -4,7 +4,7 @@ import random
 import datetime
 
 from helper.general_util import clean_json
-from helper.configuration import MIKRO, PRODUCT_ID
+from helper.configuration import MIKRO, PRODUCT_ID, FILE_SEGMENT_1, FILE_SEGMENT_2, CSV_PATH
 
 def read_csv(path):
     data = []
@@ -41,25 +41,25 @@ def randomize_and_partition(arr):
     write_segments_to_csv(segment1, segment2);
     return segment1, segment2
 
-def pick_current_used_segment():
+def pick_current_used_segment(segment_file_used):
+    if segment_file_used:
+        return segment_file_used
+
     today = datetime.datetime.today().strftime('%A')
     file_name = ''
     if today == 'Friday':
-        file_name = 'segment_1.csv'
+        file_name = FILE_SEGMENT_1
         print("Today is Friday use segment 1")
     elif today == 'Saturday':
-        file_name = 'segment_2.csv'
+        file_name = FILE_SEGMENT_1
         print("Today is Friday use segment 2")
     else:
         print("Today is neither Friday nor Saturday. No file will be created.")
-        return
+        file_name = CSV_PATH
+        # return
     return file_name
 
 def write_segments_to_csv(segment1, segment2):
-    # Define the CSV file names
-    file_1 = 'segment_1.csv'
-    file_2 = 'segment_2.csv'
-    
     # Function to write a segment to a CSV file
     def write_to_csv(filename, segment):
         with open(filename, mode='w', newline='') as file:
@@ -68,8 +68,8 @@ def write_segments_to_csv(segment1, segment2):
             writer.writerows(segment)
     
     # Write each segment to its respective CSV file
-    write_to_csv(file_1, segment1)
-    write_to_csv(file_2, segment2)
+    write_to_csv(FILE_SEGMENT_1, segment1)
+    write_to_csv(FILE_SEGMENT_2, segment2)
 
 
 def format_transaction_data(nik, check_nik_result, type):

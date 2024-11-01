@@ -25,7 +25,8 @@ def main():
     else:
         # randomize and partition the data for friday and saturday
         randomize_and_partition(rawData)
-        selected_file_name = pick_current_used_segment()
+        default_selected_file_name = None
+        selected_file_name = pick_current_used_segment(default_selected_file_name)
     
     data = read_csv(selected_file_name)
     length_data = len(data)
