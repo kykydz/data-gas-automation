@@ -26,8 +26,13 @@ def read_csv(path):
             data.append(row_data)
     return data
 
-def randomize_and_partition(arr):
+def randomize_and_partition(arr, n):
+    # Shuffle array
     random.shuffle(arr)
+    
+    # take n data points
+    arr = arr[:n]
+    
     # Determine the split point (between 50% and 65% of the array length)
     split_point = random.randint(int(len(arr) * 0.50), int(len(arr) * 0.65))
     # Break the array into two segments
@@ -38,7 +43,7 @@ def randomize_and_partition(arr):
     print(f'Segment 2 length: {len(segment2)}')
 
     # Write the segments to CSV files
-    write_segments_to_csv(segment1, segment2);
+    write_segments_to_csv(segment1, segment2)
     return segment1, segment2
 
 def pick_current_used_segment(segment_file_used):

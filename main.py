@@ -1,6 +1,6 @@
 import json
 
-from helper.configuration import CSV_PATH, IS_RECONCILIATION
+from helper.configuration import CSV_PATH, IS_RECONCILIATION, N_GAS_DATA
 from helper.csv_file_parser_util import read_csv, randomize_and_partition, pick_current_used_segment, format_transaction_data
 from helper.general_util import random_sleep
 from helper.api import process_transaction, check_nik
@@ -24,7 +24,7 @@ def main():
         selected_file_name = CSV_PATH
     else:
         # randomize and partition the data for friday and saturday
-        randomize_and_partition(rawData)
+        randomize_and_partition(rawData, N_GAS_DATA)
         default_selected_file_name = None
         selected_file_name = pick_current_used_segment(default_selected_file_name)
     
