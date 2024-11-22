@@ -1,7 +1,7 @@
 import json
 
-from helper.configuration import CSV_PATH, IS_RECONCILIATION, N_GAS_DATA
-from helper.csv_file_parser_util import read_csv, randomize_and_partition, pick_current_used_segment, format_transaction_data
+from helper.configuration import CSV_PATH, IS_RECONCILIATION, N_GAS_DATA, TEST_CSV_PATH
+from helper.csv_file_parser_util import read_csv, format_transaction_data, file_selection
 from helper.general_util import random_sleep
 from helper.api import process_transaction, check_nik
 
@@ -14,22 +14,10 @@ def execute(rowData, nikResult, i, length_data):
     print('\n')
 
 def main():
-    # Read CSV file and convert to JSON structure
-    rawData = read_csv(CSV_PATH)
-    
-    selected_file_name = ''
-    # Read or use all data if reconciliation
-    if IS_RECONCILIATION:
-        print('Start Reconciliation it is using all data')
-        selected_file_name = CSV_PATH
-    else:
-        # randomize and partition the data for friday and saturday
-        randomize_and_partition(rawData, N_GAS_DATA)
-        default_selected_file_name = None
-        selected_file_name = pick_current_used_segment(default_selected_file_name)
-    
+    selected_file_name = file_selection(TEST_CSV_PATH)
     data = read_csv(selected_file_name)
     length_data = len(data)
+
     print(f'File segment: {selected_file_name}')
     print(f'Is Reconciliation: {IS_RECONCILIATION}')
     print(f'Processing data: {length_data}')

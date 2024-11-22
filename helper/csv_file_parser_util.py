@@ -4,7 +4,9 @@ import random
 import datetime
 
 from helper.general_util import clean_json
-from helper.configuration import MIKRO, PRODUCT_ID, FILE_SEGMENT_1, FILE_SEGMENT_2, CSV_PATH
+from helper.configuration import MIKRO, PRODUCT_ID, FILE_SEGMENT_1, FILE_SEGMENT_2, CSV_PATH, IS_RECONCILIATION, N_GAS_DATA
+
+from helper.general_util import random_sleep
 
 def read_csv(path):
     data = []
@@ -32,7 +34,7 @@ def randomize_and_partition(arr, n):
     
     # take n data points
     arr = arr[:n]
-    
+
     # Determine the split point (between 50% and 65% of the array length)
     split_point = random.randint(int(len(arr) * 0.50), int(len(arr) * 0.65))
     # Break the array into two segments
@@ -56,11 +58,11 @@ def pick_current_used_segment(segment_file_used):
         file_name = FILE_SEGMENT_1
         print("Today is Friday use segment 1")
     elif today == 'Saturday':
-        file_name = FILE_SEGMENT_1
-        print("Today is Friday use segment 2")
+        file_name = FILE_SEGMENT_2
+        print("Today is Saturday use segment 2")
     else:
         print("Today is neither Friday nor Saturday. No file will be created.")
-        file_name = CSV_PATH
+        file_name = FILE_SEGMENT_2
         # return
     return file_name
 
@@ -124,3 +126,34 @@ def format_transaction_data(nik, check_nik_result, type):
     cleaned_data = clean_json(data)
     print(json.dumps(data))
     return cleaned_data
+
+def file_selection(default_selected_file_name):
+    # MODE: RECONCILIATION
+    if IS_RECONCILIATION:
+        print('Start Reconciliation it is using all data')
+        return CSV_PATH
+    
+    # MODE: TESTING
+    if default_selected_file_name != None:
+        isValidCSVFile = default_selected_file_name.startswith("file/") and default_selected_file_name.endswith(".csv")
+        if isinstance(default_selected_file_name, str) and isValidCSVFile:
+            return default_selected_file_name
+    
+    # MODE: NORMAL
+    rawData = read_csv(CSV_PATH)
+    
+    # check if this is saturday do not randomize
+    today = datetime.datetime.today().strftime('%A')
+    if today == 'Saturday':
+        print("Today is Saturday , continue?")
+        random_sleep(6,10)
+        selected_file_name = pick_current_used_segment(default_selected_file_name)
+        return selected_file_name
+    else:
+        print("Today is Friday , randomizing and partitioning...")
+        random_sleep(6,10)
+        # randomize and partition the data for friday
+        randomize_and_partition(rawData, N_GAS_DATA)
+        selected_file_name = pick_current_used_segment(default_selected_file_name)
+
+        return selected_file_name
