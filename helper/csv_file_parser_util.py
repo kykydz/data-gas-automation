@@ -130,8 +130,8 @@ def format_transaction_data(nik, check_nik_result, type):
 def file_selection(default_selected_file_name):
     # MODE: RECONCILIATION
     if IS_RECONCILIATION:
-        print('Start Reconciliation it is using all data')
-        return CSV_PATH
+        if default_selected_file_name != None:
+            return default_selected_file_name
     
     # MODE: TESTING
     if default_selected_file_name != None:

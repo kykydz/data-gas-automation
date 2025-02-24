@@ -1,6 +1,6 @@
 import json
 
-from helper.configuration import CSV_PATH, IS_RECONCILIATION, N_GAS_DATA, TEST_CSV_PATH
+from helper.configuration import FILE_RECON, IS_RECONCILIATION, TEST_CSV_PATH, BID_TYPES_TO_RECONCILIATE
 from helper.csv_file_parser_util import read_csv, format_transaction_data, file_selection
 from helper.general_util import random_sleep
 from helper.api import process_transaction, check_nik
@@ -15,10 +15,14 @@ def execute(rowData, nikResult, i, length_data):
 
 def main():
     selected_file_name = file_selection(TEST_CSV_PATH)
-    data = read_csv(selected_file_name)
+    if IS_RECONCILIATION:
+        selected_file_name = FILE_RECON
+        print('\nReconciliation mode is detected, continue?')
+
+    data = read_csv(selected_file_name) 
     length_data = len(data)
 
-    print(f'File segment: {selected_file_name}')
+    print(f'\nFile segment: {selected_file_name}')
     print(f'Is Reconciliation: {IS_RECONCILIATION}')
     print(f'Processing data: {length_data}')
 
@@ -30,12 +34,12 @@ def main():
 
         # Execute only mikro if reconciliation
         if IS_RECONCILIATION:
-            if row['Type'] == 'mikro':
+            if row['Type'] in BID_TYPES_TO_RECONCILIATE:
                 execute(row, nikResult, i, length_data)
         else:
             execute(row, nikResult, i, length_data)
 
         i = i + 1
-        random_sleep(8, 15)
+        random_sleep(20, 30)
 
 main()
